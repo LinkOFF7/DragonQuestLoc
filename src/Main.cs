@@ -170,6 +170,8 @@ namespace DragonQuestLoc
 
                     fs.Close();
                 }
+                export_txt.Enabled = true;
+                import_txt.Enabled = true;
             }
         }
 
@@ -198,7 +200,7 @@ namespace DragonQuestLoc
                     {
                         CurrentMesItems[index].translated = result.Item2;
 
-                        ResetUI();
+                        //ResetUI();
                     }
                 }
             }
@@ -297,6 +299,51 @@ namespace DragonQuestLoc
             }
 
             ResetUI();
+        }
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            ResetUI();
+        }
+
+        private void export_txt_Click(object sender, EventArgs e)
+        {
+            if(CurrentMesItems != null)
+            {
+                List<string> text = new List<string>();
+                SaveFileDialog save = new SaveFileDialog();
+                save.Filter = "Text files .txt|*.txt";
+                if(save.ShowDialog() == DialogResult.OK)
+                {
+                    foreach(var mes in CurrentMesItems)
+                    {
+                        text.Add(mes.original.Replace("\n", "{CL}").Replace("\r", "{RF}")); ;
+                    }
+                    File.WriteAllLines(save.FileName, text);
+                }
+            }
+        }
+
+        private void import_txt_Click(object sender, EventArgs e)
+        {
+            if (CurrentMesItems != null)
+            {
+                OpenFileDialog open = new OpenFileDialog();
+                open.Filter = "Text files .txt|*.txt";
+                if(open.ShowDialog() == DialogResult.OK)
+                {
+                    List<string> text = File.ReadAllLines(open.FileName).ToList();
+                    for(int i = 0; i < CurrentMesItems.Length; i++)
+                    {
+                        CurrentMesItems[i].translated = text[i].Replace("{CL}", "\n").Replace("{RF}", "\r");
+                        if (CurrentMesFile.UpdateValue(i, CurrentMesItems[i].key, CurrentMesItems[i].translated))
+                        {
+                            
+                        }
+                    }
+                    ResetUI();
+                }
+            }
         }
     }
 }
